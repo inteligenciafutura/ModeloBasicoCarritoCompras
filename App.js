@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, TouchableHighlight,Alert, AsyncStorage } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, TouchableHighlight,Alert, AsyncStorage, Dimensions, ScrollView } from 'react-native';
 
+const screenWidth = Math.round(Dimensions.get('window').width);
 export default class Tarjetas extends Component {
 
 constructor(){
@@ -102,6 +103,40 @@ sumarUnidad(idProducto){
    })
 }
 
+restarUnidad(idProducto){
+  const arrayData = []
+  let datos = []
+  this.state.list.map((data, i)=> {
+    if(data.idProducto == idProducto ){
+      var suma = parseInt(data.cantidad) - 1
+      if(suma < 0){
+        suma = 0
+      }
+      ////////////////////////////
+       datos.push( {
+        idProducto: data.idProducto,
+        name: data.name,
+        cantidad: suma,
+        comment: data.comment
+      })
+      ///////////////////////////
+    }else{
+      datos.push({
+        idProducto: data.idProducto,
+        name: data.name,
+        cantidad: data.cantidad,
+        comment: data.comment
+      })
+    }
+   })
+   arrayData.push(datos);
+   //alert( JSON.stringify(datos) )
+   AsyncStorage.setItem('database_form', JSON.stringify(datos)).then(()=> {
+     //Alert.alert("Actualización completa")
+     this.refreshCantidades()
+   })
+}
+
 parseData(){
   if(this.state.list){
     return this.state.list.map((data, i)=> {
@@ -115,6 +150,10 @@ parseData(){
           <Text>comment: {data.comment}</Text>
           <TouchableHighlight style={styles.button} onPress = {()=> this.sumarUnidad(data.idProducto) } >
             <Text style={styles.textButton}>Sumar unidad</Text>
+          </TouchableHighlight>
+          <Text> </Text>
+          <TouchableHighlight style={styles.button} onPress = {()=> this.restarUnidad(data.idProducto) } >
+            <Text style={styles.textButton}>Restar unidad</Text>
           </TouchableHighlight>
         </View>
       )
@@ -180,8 +219,112 @@ return (
 
 {/* AQUI PINTO EL ARREGLO */}
 <View>
- {this.parseData()}
+ {/* {this.parseData()} */}
 </View>
+
+{/* --------CARD-------- */}
+<View style={{ 
+  width:"100%", 
+  height:150,
+  backgroundColor:"white", 
+  flexDirection:"row", 
+  borderRadius:15,
+  shadowColor: "#000",
+shadowOffset: {
+	width: 0,
+	height: 2,
+},
+shadowOpacity: 0.25,
+shadowRadius: 3.84,
+
+elevation: 5,
+   }} >
+{/* -----ESPACIO DE LA IMAGEN--------- */}
+ <View style={{ width:150, height:150, backgroundColor:"blue" }} >
+ <Image
+  style={{flex:1, height: undefined, width: undefined}}
+  source={require('./assets/idea.jpg')}
+  resizeMode="contain"
+/>
+ </View>
+ {/* -----FIN ESPACIO DE LA IMAGEN--------- */}
+ <View style={{flex:1, backgroundColor:"white", padding:5, borderRadius:15 }} >
+ 
+ {/* -----BOTON ELIMINAR--------- */}
+<TouchableHighlight style = {{ position:"absolute", right:6, top:5 , backgroundColor:"gray", width:20, height:20, borderRadius:15 }}
+onPress={()=> alert("Eliminar") } >
+  <Text style={{color:"white", textAlign:"center" }}>X</Text>
+</TouchableHighlight>
+{/* -----FIN BOTON ELIMINAR--------- */}
+
+  <View style={{ width:"90%", backgroundColor:"white" }} >
+
+  {/* -----TITULO--------- */}
+  <ScrollView 
+  style={{ 
+    height:37,
+    width:"100%"
+  }}
+  //pagingEnabled={true}
+  ref="scrollView"
+  scrollEnabled={true}
+  horizontal={false}
+  persistentScrollbar={false}
+  >
+   <Text style={{fontWeight:"bold"}} >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nunc purus, bibendum a malesuada in</Text>
+  </ScrollView>
+   {/* -----FIN TITULO--------- */}
+
+{/* -----DESCRIPCION--------- */}
+   <ScrollView 
+   style={{ 
+    height:51,
+    left:-1, 
+    width:"100%"
+    }}
+    pagingEnabled={true}
+    ref="scrollView"
+    scrollEnabled={true}
+    horizontal={false}
+    persistentScrollbar={true}
+    nestedScrollEnabled={true}
+   >
+  <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nunc purus, bibendum a malesuada in</Text>
+  </ScrollView>
+  {/* -----FIN DESCRIPCION--------- */}
+
+  {/* -----PRECIOS--------- */}
+  <View>
+   <Text style={{textAlign:"center" }} >$1000</Text>
+   <View style={{height:5}} />
+   {/* -----SUMAR Y RESTAR--------- */}
+    <View style={{ flexDirection:"row", justifyContent:"center" }} >
+    {/* RESTAR */}
+      <View style = {{ width:25, height:25, backgroundColor:"red", borderRadius:25 }} >
+        <Text style={{color:"white", textAlign:"center", fontSize:18, fontWeight:"bold" }} >-</Text>
+      </View>
+    {/* FIN RESTAR */}
+
+   {/* INPUT DE VALORES  */}
+   <View style = {{ width:60, height:23, backgroundColor:"green", borderRadius:15 }} >
+     <Text style={{ textAlign:"center", color:"black" }} >5 UND</Text>
+   </View>
+   {/* FIN INPUT DE VALORES */}
+
+   {/* SUMAR */}
+   <View style = {{ width:25, height:25, backgroundColor:"blue", borderRadius:25 }} >
+        <Text style={{color:"white", textAlign:"center", fontSize:18, fontWeight:"bold" }} >+</Text>
+      </View>
+    {/* FIN SUMAR */}
+
+    </View>
+   {/* -----FIN SUMAR Y RESTAR--------- */}
+  </View>
+
+  </View>
+ </View>
+</View>
+{/* --------FIN CARD-------- */}
 
 </View>
 );
